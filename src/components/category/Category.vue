@@ -35,7 +35,16 @@
               <tr :active="props.selected" @click="props.selected = !props.selected">
                 <td class="text-xs-center">{{ props.item.id }}</td>
                 <td class="text-xs-center">{{props.item.title}}</td>
-                <td class="text-xs-center" style="display:block; text-align:center">
+
+                <td class="text-xs-center" style="display:inline-block; margin:5px 0">
+                  <img
+                    :src="`${server.host}/${props.item.icon}`"
+                    height="50"
+                    v-if="props.item.icon"
+                  >
+                </td>
+
+                <td class="text-xs-center" style="text-align:center">
                   <img
                     :src="`${server.host}/${props.item.image}`"
                     height="50"
@@ -73,6 +82,7 @@ import store from '../../store.js'
 import { EventBus } from "../../event-bus.js";
 import UpdateDialogue from "./UpdateDialogue.vue";
 import CreateDialogue from "./CreateDialogue.vue";
+import { constants } from 'crypto';
 export default {
   components: {
     UpdateDialogue,
@@ -96,7 +106,9 @@ export default {
 
       headers: [
         { text: "Id", align: "left", value: "id" },
+        
         { text: "Title", value: "title" },
+        { text: "Icon", value: "icon" },
         { text: "Image", value: "image" }
       ],
       items: [],
@@ -107,6 +119,7 @@ export default {
       updateItem: true,
       item: {
         id: "",
+        icon:"",
         image: "",
         title: ""
       }
@@ -153,6 +166,8 @@ export default {
 
     getAllItems() {
       axios.get(`${this.server.host}/${this.storedObj.folder}`).then(response => {
+
+        console.log(response.data)
         // this.lastItem = Math.max.apply(
         //   Math,
         //   response.data.map(function(item) {

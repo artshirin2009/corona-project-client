@@ -11,6 +11,24 @@
               <v-flex xs12>
                 <v-text-field v-model="item.title" label="Название" hint="Бармен"></v-text-field>
               </v-flex>
+              
+
+              <v-flex xs12>
+                <v-text-field
+                  label="Иконка"
+                  @click="pickIconFile"
+                  v-model="item.icon"
+                  prepend-icon="attach_file"
+                ></v-text-field>
+                <input
+                  type="file"
+                  style="display: none"
+                  ref="icon"
+                  accept="image/*"
+                  @change="onIconFilePicked"
+                />
+              </v-flex>
+
               <v-flex xs12>
                 <v-text-field
                   label="Картинка"
@@ -24,7 +42,7 @@
                   ref="image"
                   accept="image/*"
                   @change="onFilePicked"
-                >
+                />
               </v-flex>
             </v-layout>
           </v-container>
@@ -44,7 +62,7 @@
 import { EventBus } from "../../event-bus.js";
 import qs from "qs";
 import axios from "axios";
-import store from '../../store.js';
+import store from "../../store.js";
 export default {
   data() {
     return {
@@ -53,26 +71,32 @@ export default {
         title: "",
         image: "",
         imageUrl: "",
-        imageFile: ""
+        imageFile: "",
+
+        icon: "",
+        iconUrl: "",
+        iconFile: ""
       },
       errorMessage: null
     };
   },
   computed: {
-    server(){
-      return store.state.server
+    server() {
+      return store.state.server;
     },
-    storedObj (){
-      return store.state.category
+    storedObj() {
+      return store.state.category;
     }
   },
   methods: {
     itemCreate() {
-      let fileToUpload = this.$refs.image.files[0];
+      let fileImageToUpload = this.$refs.image.files[0];
+      let fileIconToUpload = this.$refs.icon.files[0];
       let formData = new FormData();
       formData.append("title", this.item.title);
-      if (fileToUpload !== "undefined") {
-        formData.append("image", fileToUpload);
+      if (fileImageToUpload !== "undefined" || fileIconToUpload !== "undefined" ) {
+        formData.append("image", fileImageToUpload);
+        formData.append("icon", fileIconToUpload);
       }
       let that = this;
       axios
@@ -84,7 +108,6 @@ export default {
         })
         .then(data => {
           that.dialog = false;
-          console.log('there')
           EventBus.$emit("updateItem");
         })
         .catch(e => {
@@ -94,6 +117,9 @@ export default {
 
     pickFile() {
       this.$refs.image.click();
+    },
+    pickIconFile() {
+      this.$refs.icon.click();
     },
 
     onFilePicked(e) {
@@ -114,7 +140,31 @@ export default {
         this.item.imageFile = "";
         this.item.imageUrl = "";
       }
+    },
+    onIconFilePicked(e) {
+      
+      const files = e.target.files;
+      if (files[0] !== undefined) {
+        this.item.icon = files[0].name;
+        if (this.item.icon.lastIndexOf(".") <= 0) {
+          return;
+        }
+        const fr = new FileReader();
+        fr.readAsDataURL(files[0]);
+        fr.addEventListener("load", () => {
+          this.item.iconUrl = fr.result;
+          this.item.iconFile = files[0];
+        });
+      } else {
+        this.item.icon = "";
+        this.item.iconFile = "";
+        this.item.iconUrl = "";
+      }
     }
+
+
+
+
   },
 
   watch: {

@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import createPersistedState from 'vuex-persistedstate';
+import createMutationsSharer from "vuex-shared-mutations";
 
 Vue.use(Vuex)
 
@@ -26,7 +27,9 @@ export default new Vuex.Store({
     isAuthorized: false,
     isAdmin: false
   },
-  plugins: [createPersistedState()],
+  plugins: [createPersistedState(),
+     createMutationsSharer({ predicate: ["exit", "authorize", "authorizeAsAdmin"] })
+    ],
   mutations: {
     authorize: state => state.isAuthorized = true,
     exit: state => {
