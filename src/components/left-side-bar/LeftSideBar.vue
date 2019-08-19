@@ -1,48 +1,39 @@
 <template>
-  <v-navigation-drawer
-  permanent
-  app
-  clipped> 
-    <v-toolbar flat>
-      <v-list>
-        <v-list-tile>
-          <v-list-tile-title class="title">
-            Категории
-          </v-list-tile-title>
+  <v-navigation-drawer value="true" clipped
+ >
+    <v-list>
+      <v-list-group class="my-class" no-action sub-group v-for="item in items" :key="item.title" @click right>
+        <template v-slot:activator>
+          <v-list-tile-action>
+            <img :src="`http://localhost:3000/${item.icon}`" alt height="20" />
+          </v-list-tile-action>
+          <v-list-tile>
+            <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+          </v-list-tile>
+        </template>
+
+        <v-list-tile v-for="(admin, i) in admins" :key="i" @click>
+          <v-list-tile-title v-text="admin[0]"></v-list-tile-title>
+          <v-list-tile-action>
+            <v-icon v-text="admin[1]"></v-icon>
+          </v-list-tile-action>
         </v-list-tile>
-      </v-list>
-    </v-toolbar>
-
-    <v-divider></v-divider>
-
-    <v-list dense class="pt-0">
-      <v-list-tile
-        v-for="item in items"
-        :key="item.title"
-        @click=""
-      >
-        <v-list-tile-action>
-          <img :src="`http://localhost:3000/${item.icon}`" alt="" height="20">
-        </v-list-tile-action>
-        <v-list-tile-content>
-          <v-list-tile-title>{{ item.title }}</v-list-tile-title>
-        </v-list-tile-content>
-      </v-list-tile>
+      </v-list-group>
     </v-list>
   </v-navigation-drawer>
 </template>
+
 <script>
-import axios from 'axios';
+import axios from "axios";
 export default {
   data: () => ({
-    show: false,
     items: [],
-    right: null
+    right: null,
+    admins: [["Management", "people_outline"], ["Settings", "settings"]],
   }),
   methods: {
     getAllCategories() {
       axios.get("http://localhost:3000/category", {}).then(response => {
-        console.log(response.data)
         return (this.items = response.data);
       });
     }
@@ -52,4 +43,12 @@ export default {
   }
 };
 </script>
-
+<style scoped>
+.my-class >>> .v-list__group__header__prepend-icon{
+  order:2;
+  margin-right: 25px;
+}
+.my-class >>> .v-list__tile__action {
+  margin-left: 30px;
+}
+</style>
