@@ -53,10 +53,8 @@ export default {
         mainCats.forEach(obj => (obj["childs"] = []));
          
         childCats.forEach(child => {
-          console.log(child.parent_id)
-          console.log(mainCats[child.parent_id-1]['childs'].push(child))
+          mainCats[child.parent_id-1]['childs'].push(child)
         });
-       console.log(mainCats)
       return this.items = mainCats;
       });
         
