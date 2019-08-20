@@ -9,6 +9,18 @@
           <v-container grid-list-md>
             <v-layout wrap>
               <v-flex xs12>
+                <v-select 
+                :items="parentCategories"
+                label="Родительская категория"
+                v-model="item.parentCategory"
+                item-value='id'
+                item-text='title'
+                return-object
+                ></v-select>
+              </v-flex>
+
+
+              <v-flex xs12>
                 <v-text-field v-model="item.title" label="Название" hint="Бармен"></v-text-field>
               </v-flex>
               
@@ -63,6 +75,7 @@ import { EventBus } from "../../event-bus.js";
 import qs from "qs";
 import axios from "axios";
 import store from "../../store.js";
+import { constants } from 'crypto';
 export default {
   data() {
     return {
@@ -75,8 +88,10 @@ export default {
 
         icon: "",
         iconUrl: "",
-        iconFile: ""
+        iconFile: "",
+        parentCategory:Number
       },
+      parentCategories: [],
       errorMessage: null
     };
   },
@@ -88,12 +103,27 @@ export default {
       return store.state.category;
     }
   },
+  mounted(){
+    this.getAllCategories()
+  },
   methods: {
+
+    getAllCategories() {
+      let arr=[];
+      axios.get("http://localhost:3000/category", {}).then(response => {
+        response.data.map(i=> arr.push({id:i.id,title:i.title}))
+        arr.push({id:0,title:"Новая категория"})
+        return (this.parentCategories = arr);
+      });
+    },
+
     itemCreate() {
       let fileImageToUpload = this.$refs.image.files[0];
       let fileIconToUpload = this.$refs.icon.files[0];
       let formData = new FormData();
       formData.append("title", this.item.title);
+      formData.append("parentCategory", this.item.parentCategory.id);
+      
       if (fileImageToUpload !== "undefined" || fileIconToUpload !== "undefined" ) {
         formData.append("image", fileImageToUpload);
         formData.append("icon", fileIconToUpload);

@@ -165,16 +165,7 @@ export default {
     },
 
     getAllItems() {
-      axios.get(`${this.server.host}/${this.storedObj.folder}`).then(response => {
-
-        console.log(response.data)
-        // this.lastItem = Math.max.apply(
-        //   Math,
-        //   response.data.map(function(item) {
-        //     return item.id;
-        //   })
-        // );
-        
+      axios.get(`${this.server.host}/${this.storedObj.folder}`).then(response => {        
         return (this.items = response.data);
       });
     }
